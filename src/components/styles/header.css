@@ -1,0 +1,70 @@
+header {
+  background-color: #eac044;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 24px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+header img {
+  height: 70px;
+  width: auto;
+}
+
+.web-app-title h1 {
+  font-family: "Fjalla One", sans-serif;
+  font-size: 1.8rem;
+  color: #1a1a1a;
+  line-height: 1.1;
+}
+
+.web-app-subtitle {
+  font-family: "Fjalla One", sans-serif;
+  font-size: 0.85rem;
+  color: #3d3b3b;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.watchlist-title {
+  font-family: "Fjalla One", sans-serif;
+  font-size: 1rem;
+  color: #1a1a1a;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 8px 14px;
+    gap: 10px;
+  }
+
+  header img {
+    height: 48px;
+  }
+
+  .web-app-title h1 {
+    font-size: 1.3rem;
+  }
+
+  .web-app-subtitle {
+    font-size: 0.75rem;
+  }
+
+  .watchlist-title {
+    font-size: 0.85rem;
+  }
+}
