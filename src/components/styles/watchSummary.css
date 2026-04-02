@@ -1,0 +1,60 @@
+.watch-summary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #1e1e21;
+  padding: 14px 32px;
+  gap: 0;
+  border-bottom: 1px solid #2e2e32;
+}
+
+.summary-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 48px;
+}
+
+.stat-label {
+  font-family: "Roboto", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #9e9e9e;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-family: "Fjalla One", sans-serif;
+  font-size: 2rem;
+  color: #eac044;
+  line-height: 1.1;
+}
+
+.summary-divider {
+  width: 1px;
+  height: 40px;
+  background-color: #2e2e32;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .watch-summary {
+    padding: 10px 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .summary-divider {
+    display: none;
+  }
+
+  .summary-stat {
+    flex: 1 1 calc(50% - 12px);
+    padding: 4px 8px;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+}
