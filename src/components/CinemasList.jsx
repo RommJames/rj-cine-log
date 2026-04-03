@@ -1,72 +1,6 @@
 import { useState } from "react";
 import "./styles/cinemasList.css";
 
-const SAMPLE_ENTRIES = [
-  {
-    id: 1,
-    title: "Interstellar",
-    type: "Movie",
-    genre: "Sci-Fi",
-    status: "Watched",
-    rating: 5,
-    dateAdded: "Mar 1, 2026",
-    comment:
-      "A breathtaking journey through space and time. Nolan at his finest — the docking scene alone is worth the watch.",
-  },
-  {
-    id: 2,
-    title: "Breaking Bad",
-    type: "TV Show",
-    genre: "Drama",
-    status: "Watching",
-    rating: 4,
-    dateAdded: "Mar 5, 2026",
-    comment: null,
-  },
-  {
-    id: 3,
-    title: "Dune: Part Two",
-    type: "Movie",
-    genre: "Sci-Fi",
-    status: "Watched",
-    rating: 4,
-    dateAdded: "Mar 10, 2026",
-    comment:
-      "Visually stunning. The desert cinematography is unlike anything I've seen. Chalamet carries the weight of the role perfectly.",
-  },
-  {
-    id: 4,
-    title: "Severance",
-    type: "TV Show",
-    genre: "Thriller",
-    status: "Watching",
-    rating: 5,
-    dateAdded: "Mar 14, 2026",
-    comment: null,
-  },
-  {
-    id: 5,
-    title: "Oppenheimer",
-    type: "Movie",
-    genre: "Drama",
-    status: "Watched",
-    rating: 4,
-    dateAdded: "Mar 18, 2026",
-    comment:
-      "Dense but rewarding. Cillian Murphy is phenomenal. The Trinity test sequence is haunting.",
-  },
-  {
-    id: 6,
-    title: "Arcane",
-    type: "TV Show",
-    genre: "Animation",
-    status: "Want to watch",
-    rating: null,
-    dateAdded: "Mar 22, 2026",
-    comment: null,
-  },
-];
-
 const TYPE_BADGE_CLASS = {
   Movie: "badge-movie",
   "TV Show": "badge-tv",
@@ -78,7 +12,7 @@ const STATUS_BADGE_CLASS = {
   "Want to watch": "status-want",
 };
 
-export default function CinemasList() {
+export default function CinemasList({ cinemas }) {
   const [modalEntry, setModalEntry] = useState(null);
   const [editEntry, setEditEntry] = useState(null);
   const [editStatus, setEditStatus] = useState("want-to-watch");
@@ -154,7 +88,7 @@ export default function CinemasList() {
 
         {/* Cards grid */}
         <div className="cinemas-cards">
-          {SAMPLE_ENTRIES.map((entry) => (
+          {cinemas.map((entry) => (
             <div key={entry.id} className="cinema-card">
               <div className="cinema-card-top">
                 <button
@@ -209,7 +143,7 @@ export default function CinemasList() {
             </div>
           ))}
 
-          {!SAMPLE_ENTRIES.length && (
+          {!cinemas.length && (
             <p className="cinemas-empty-state">
               No entries yet. Add your first film above.
             </p>
