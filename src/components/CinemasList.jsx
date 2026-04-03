@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "./styles/cinemasList.css";
 
 const SAMPLE_ENTRIES = [
@@ -9,6 +10,8 @@ const SAMPLE_ENTRIES = [
     status: "Watched",
     rating: 5,
     dateAdded: "Mar 1, 2026",
+    comment:
+      "A breathtaking journey through space and time. Nolan at his finest — the docking scene alone is worth the watch.",
   },
   {
     id: 2,
@@ -18,6 +21,7 @@ const SAMPLE_ENTRIES = [
     status: "Watching",
     rating: 4,
     dateAdded: "Mar 5, 2026",
+    comment: null,
   },
   {
     id: 3,
@@ -27,6 +31,8 @@ const SAMPLE_ENTRIES = [
     status: "Watched",
     rating: 4,
     dateAdded: "Mar 10, 2026",
+    comment:
+      "Visually stunning. The desert cinematography is unlike anything I've seen. Chalamet carries the weight of the role perfectly.",
   },
   {
     id: 4,
@@ -36,6 +42,7 @@ const SAMPLE_ENTRIES = [
     status: "Watching",
     rating: 5,
     dateAdded: "Mar 14, 2026",
+    comment: null,
   },
   {
     id: 5,
@@ -45,6 +52,8 @@ const SAMPLE_ENTRIES = [
     status: "Watched",
     rating: 4,
     dateAdded: "Mar 18, 2026",
+    comment:
+      "Dense but rewarding. Cillian Murphy is phenomenal. The Trinity test sequence is haunting.",
   },
   {
     id: 6,
@@ -54,6 +63,7 @@ const SAMPLE_ENTRIES = [
     status: "Want to watch",
     rating: null,
     dateAdded: "Mar 22, 2026",
+    comment: null,
   },
 ];
 
@@ -69,6 +79,30 @@ const STATUS_BADGE_CLASS = {
 };
 
 export default function CinemasList() {
+  const [modalEntry, setModalEntry] = useState(null);
+  const [editEntry, setEditEntry] = useState(null);
+  const [editStatus, setEditStatus] = useState("want-to-watch");
+  const [editRating, setEditRating] = useState(0);
+  const [editHoverRating, setEditHoverRating] = useState(0);
+
+  const isEditWatched = editStatus === "watched";
+
+  function openEditModal(entry) {
+    const statusMap = {
+      Watched: "watched",
+      Watching: "watching",
+      "Want to watch": "want-to-watch",
+    };
+    setEditEntry(entry);
+    setEditStatus(statusMap[entry.status] ?? "want-to-watch");
+    setEditRating(entry.rating ?? 0);
+    setEditHoverRating(0);
+  }
+
+  function closeEditModal() {
+    setEditEntry(null);
+  }
+
   return (
     <section className="cinemas-list-wrapper">
       <div className="cinemas-list-container">
@@ -123,11 +157,18 @@ export default function CinemasList() {
           {SAMPLE_ENTRIES.map((entry) => (
             <div key={entry.id} className="cinema-card">
               <div className="cinema-card-top">
-                <p className="cinema-card-title">{entry.title}</p>
+                <button
+                  type="button"
+                  className="cinema-card-title-btn"
+                  onClick={() => setModalEntry(entry)}
+                >
+                  {entry.title}
+                </button>
                 <div className="cinema-card-actions">
                   <button
                     type="button"
                     className="cinema-action-btn cinema-edit-btn"
+                    onClick={() => openEditModal(entry)}
                     aria-label="Edit entry"
                   >
                     ✎
@@ -175,6 +216,210 @@ export default function CinemasList() {
           )}
         </div>
       </div>
+
+      {/* Detail modal */}
+      {modalEntry && (
+        <div
+          className="cinema-modal-overlay"
+          onClick={() => setModalEntry(null)}
+        >
+          <div className="cinema-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="cinema-modal-header">
+              <h2 className="cinema-modal-title">{modalEntry.title}</h2>
+              <button
+                type="button"
+                className="cinema-modal-close"
+                onClick={() => setModalEntry(null)}
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            <div className="cinema-modal-tags">
+              <span
+                className={`cinema-badge type-badge ${TYPE_BADGE_CLASS[modalEntry.type] ?? ""}`}
+              >
+                {modalEntry.type}
+              </span>
+              <span
+                className={`cinema-badge status-badge ${STATUS_BADGE_CLASS[modalEntry.status] ?? ""}`}
+              >
+                {modalEntry.status}
+              </span>
+              <span className="cinema-genre-text">{modalEntry.genre}</span>
+            </div>
+            {modalEntry.rating && (
+              <div className="cinema-modal-stars">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    className={`cinema-star ${star <= modalEntry.rating ? "filled" : "empty"}`}
+                  >
+                    ★
+                  </span>
+                ))}
+                <span className="cinema-modal-rating-label">
+                  {modalEntry.rating}.0 / 5
+                </span>
+              </div>
+            )}
+            <p className="cinema-modal-date">Added {modalEntry.dateAdded}</p>
+            {modalEntry.status === "Watched" && modalEntry.comment && (
+              <div className="cinema-modal-comment">
+                <p className="cinema-modal-comment-label">Thoughts</p>
+                <p className="cinema-modal-comment-text">
+                  {modalEntry.comment}
+                </p>
+              </div>
+            )}
+            {modalEntry.status === "Watched" && !modalEntry.comment && (
+              <p className="cinema-modal-no-comment">
+                No thoughts added for this entry.
+              </p>
+            )}
+            <div className="cinema-modal-footer">
+              <button
+                type="button"
+                className="cinema-modal-edit-btn"
+                onClick={() => {
+                  setModalEntry(null);
+                  openEditModal(modalEntry);
+                }}
+                aria-label="Edit entry"
+              >
+                ✎ Edit Entry
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Edit modal */}
+      {editEntry && (
+        <div className="cinema-modal-overlay" onClick={closeEditModal}>
+          <div
+            className="cinema-modal cinema-edit-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="cinema-modal-header">
+              <h2 className="cinema-modal-title">Edit Entry</h2>
+              <button
+                type="button"
+                className="cinema-modal-close"
+                onClick={closeEditModal}
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+
+            <form className="cinema-edit-form">
+              <input
+                className="cinema-edit-input"
+                type="text"
+                name="title"
+                defaultValue={editEntry.title}
+                placeholder="Title"
+              />
+
+              <div className="cinema-edit-selects">
+                <select
+                  className="cinema-edit-select"
+                  name="type"
+                  defaultValue={editEntry.type === "TV Show" ? "tv" : "movie"}
+                >
+                  <option value="movie">Movie</option>
+                  <option value="tv">TV Show</option>
+                </select>
+                <select
+                  className="cinema-edit-select"
+                  name="genre"
+                  defaultValue={editEntry.genre.toLowerCase()}
+                >
+                  <option value="action">Action</option>
+                  <option value="animation">Animation</option>
+                  <option value="comedy">Comedy</option>
+                  <option value="documentary">Documentary</option>
+                  <option value="drama">Drama</option>
+                  <option value="horror">Horror</option>
+                  <option value="romance">Romance</option>
+                  <option value="sci-fi">Sci-Fi</option>
+                  <option value="thriller">Thriller</option>
+                </select>
+                <select
+                  className="cinema-edit-select"
+                  name="status"
+                  value={editStatus}
+                  onChange={(e) => {
+                    setEditStatus(e.target.value);
+                    setEditRating(0);
+                  }}
+                >
+                  <option value="want-to-watch">Want to watch</option>
+                  <option value="watching">Watching</option>
+                  <option value="watched">Watched</option>
+                </select>
+              </div>
+
+              {isEditWatched && (
+                <div className="cinema-edit-watched-section">
+                  <div className="cinema-edit-rating">
+                    <span className="cinema-edit-field-label">Your rating</span>
+                    <div className="cinema-edit-stars">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          className={`cinema-edit-star ${
+                            star <= (editHoverRating || editRating)
+                              ? "active"
+                              : ""
+                          }`}
+                          onClick={() => setEditRating(star)}
+                          onMouseEnter={() => setEditHoverRating(star)}
+                          onMouseLeave={() => setEditHoverRating(0)}
+                          aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
+                        >
+                          ★
+                        </button>
+                      ))}
+                      {editRating > 0 && (
+                        <span className="cinema-edit-rating-label">
+                          {editRating}.0
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="cinema-edit-comment">
+                    <span className="cinema-edit-field-label">
+                      Your thoughts
+                    </span>
+                    <textarea
+                      className="cinema-edit-textarea"
+                      name="comment"
+                      defaultValue={editEntry.comment ?? ""}
+                      placeholder="What did you think? (optional)"
+                      rows={3}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="cinema-edit-actions">
+                <button
+                  type="button"
+                  className="cinema-edit-cancel-btn"
+                  onClick={closeEditModal}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="cinema-edit-save-btn">
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
