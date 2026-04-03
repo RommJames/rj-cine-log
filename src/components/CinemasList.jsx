@@ -89,58 +89,12 @@ export default function CinemasList({ cinemas }) {
         {/* Cards grid */}
         <div className="cinemas-cards">
           {cinemas.map((entry) => (
-            <div key={entry.id} className="cinema-card">
-              <div className="cinema-card-top">
-                <button
-                  type="button"
-                  className="cinema-card-title-btn"
-                  onClick={() => setModalEntry(entry)}
-                >
-                  {entry.title}
-                </button>
-                <div className="cinema-card-actions">
-                  <button
-                    type="button"
-                    className="cinema-action-btn cinema-edit-btn"
-                    onClick={() => openEditModal(entry)}
-                    aria-label="Edit entry"
-                  >
-                    ✎
-                  </button>
-                  <button
-                    type="button"
-                    className="cinema-action-btn cinema-delete-btn"
-                    aria-label="Delete entry"
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
-              <div className="cinema-card-tags">
-                <span
-                  className={`cinema-badge type-badge ${TYPE_BADGE_CLASS[entry.type] ?? ""}`}
-                >
-                  {entry.type}
-                </span>
-                <span
-                  className={`cinema-badge status-badge ${STATUS_BADGE_CLASS[entry.status] ?? ""}`}
-                >
-                  {entry.status}
-                </span>
-                <span className="cinema-genre-text">{entry.genre}</span>
-              </div>
-              <div className="cinema-card-stars">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <span
-                    key={star}
-                    className={`cinema-star ${entry.rating && star <= entry.rating ? "filled" : "empty"}`}
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
-              <p className="cinema-card-date">Added {entry.dateAdded}</p>
-            </div>
+            <CinemaCard
+              entry={entry}
+              key={entry.id}
+              setModalEntry={setModalEntry}
+              openEditModal={openEditModal}
+            />
           ))}
 
           {!cinemas.length && (
@@ -355,5 +309,62 @@ export default function CinemasList({ cinemas }) {
         </div>
       )}
     </section>
+  );
+}
+
+function CinemaCard({ entry, setModalEntry, openEditModal }) {
+  return (
+    <div className="cinema-card">
+      <div className="cinema-card-top">
+        <button
+          type="button"
+          className="cinema-card-title-btn"
+          onClick={() => setModalEntry(entry)}
+        >
+          {entry.title}
+        </button>
+        <div className="cinema-card-actions">
+          <button
+            type="button"
+            className="cinema-action-btn cinema-edit-btn"
+            onClick={() => openEditModal(entry)}
+            aria-label="Edit entry"
+          >
+            ✎
+          </button>
+          <button
+            type="button"
+            className="cinema-action-btn cinema-delete-btn"
+            aria-label="Delete entry"
+          >
+            ×
+          </button>
+        </div>
+      </div>
+      <div className="cinema-card-tags">
+        <span
+          className={`cinema-badge type-badge ${TYPE_BADGE_CLASS[entry.type] ?? ""}`}
+        >
+          {entry.type}
+        </span>
+        <span
+          className={`cinema-badge status-badge ${STATUS_BADGE_CLASS[entry.status] ?? ""}`}
+        >
+          {entry.status}
+        </span>
+        <span className="cinema-genre-text">{entry.genre}</span>
+      </div>
+      <div className="cinema-card-stars">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            className={`cinema-star ${entry.rating && star <= entry.rating ? "filled" : "empty"}`}
+          >
+            ★
+          </span>
+        ))}
+      </div>
+      <p className="cinema-card-date">Added {entry.dateAdded}</p>
+    </div>
   );
 }

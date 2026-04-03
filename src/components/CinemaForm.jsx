@@ -1,42 +1,88 @@
 import { useState } from "react";
 import "./styles/cinemaForm.css";
 
-export default function CinemaForm() {
-  const [status, setStatus] = useState("want-to-watch");
-  const [rating, setRating] = useState(0);
+export default function CinemaForm({ onAddCinemas }) {
+  const [title, setTitle] = useState("");
+  const [cinemaType, setCinemaType] = useState("Movie");
+  const [genre, setGenre] = useState("Action");
+  const [status, setStatus] = useState("Want to watch");
+  const [rating, setRating] = useState(null);
   const [hoverRating, setHoverRating] = useState(0);
+  const [comment, setComment] = useState("");
 
-  const isWatched = status === "watched";
+  const isWatched = status === "Watched";
+
+  function handleOnSubmit(e) {
+    e.preventDefault();
+
+    if (!title) return;
+
+    const newCinema = {
+      id: crypto.randomUUID(),
+      title,
+      type: cinemaType,
+      genre,
+      status,
+      rating,
+      dateAdded: new Date().toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }),
+      comment,
+    };
+
+    onAddCinemas(newCinema);
+
+    setTitle("");
+    setCinemaType("Movie");
+    setGenre("Action");
+    setStatus("Want to watch");
+    setRating(null);
+    setComment("");
+  }
 
   return (
     <section className="cinema-form-wrapper">
       <div className="cinema-form-container">
         <p className="cinema-form-heading">Add entry</p>
-        <form className="cinema-form">
+        <form className="cinema-form" onSubmit={handleOnSubmit}>
           <div className="cinema-form-row">
             <input
               className="cinema-form-input"
               type="text"
               placeholder="Title (e.g. Interstellar)"
               name="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
-            <select className="cinema-form-select" name="type">
-              <option value="movie">Movie</option>
-              <option value="tv">TV Show</option>
+            <select
+              className="cinema-form-select"
+              name="type"
+              value={cinemaType}
+              onChange={(e) => setCinemaType(e.target.value)}
+            >
+              <option value="Movie">Movie</option>
+              <option value="TV Show">TV Show</option>
             </select>
-            <select className="cinema-form-select" name="genre">
+            <select
+              className="cinema-form-select"
+              name="genre"
+              value={genre}
+              onChange={(e) => setGenre(e.target.value)}
+            >
               <option value="" disabled>
                 Genre
               </option>
-              <option value="action">Action</option>
-              <option value="comedy">Comedy</option>
-              <option value="drama">Drama</option>
-              <option value="horror">Horror</option>
-              <option value="sci-fi">Sci-Fi</option>
-              <option value="thriller">Thriller</option>
-              <option value="romance">Romance</option>
-              <option value="animation">Animation</option>
-              <option value="documentary">Documentary</option>
+              <option value="Action">Action</option>
+              <option value="Comedy">Comedy</option>
+              <option value="Drama">Drama</option>
+              <option value="Horror">Horror</option>
+              <option value="Sci-Fi">Sci-Fi</option>
+              <option value="Thriller">Thriller</option>
+              <option value="Romance">Romance</option>
+              <option value="Animation">Animation</option>
+              <option value="Documentary">Documentary</option>
             </select>
             <select
               className="cinema-form-select"
@@ -44,12 +90,12 @@ export default function CinemaForm() {
               value={status}
               onChange={(e) => {
                 setStatus(e.target.value);
-                setRating(0);
+                setRating(null);
               }}
             >
-              <option value="want-to-watch">Want to watch</option>
-              <option value="watching">Watching</option>
-              <option value="watched">Watched</option>
+              <option value="Want to watch">Want to watch</option>
+              <option value="Watching">Watching</option>
+              <option value="Watched">Watched</option>
             </select>
             <button type="submit" className="cinema-form-btn">
               + Add
@@ -88,6 +134,8 @@ export default function CinemaForm() {
                   name="comment"
                   placeholder="What did you think? (optional)"
                   rows={2}
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
                 />
               </div>
             </div>

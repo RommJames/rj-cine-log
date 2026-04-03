@@ -73,11 +73,15 @@ const SAMPLE_ENTRIES = [
 function App() {
   const [cinemas, setCinemas] = useState(SAMPLE_ENTRIES);
 
+  function handleAddCinemas(addItems) {
+    setCinemas([addItems, ...cinemas]);
+  }
+
   return (
     <>
       <Header />
       <WatchSummary cinemas={cinemas} />
-      <CinemaForm />
+      <CinemaForm onAddCinemas={handleAddCinemas} />
       <CinemasList cinemas={cinemas} />
     </>
   );
