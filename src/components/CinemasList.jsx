@@ -21,17 +21,17 @@ export default function CinemasList({
   const [modalEntry, setModalEntry] = useState(null);
   const [editEntry, setEditEntry] = useState(null);
   const [sortBy, setSortBy] = useState("date-added");
+  const [filterType, setFilterType] = useState("All");
+  const [filterStatus, setFilterStatus] = useState("All");
 
-  const sortedCinemas = [...cinemas].sort((a, b) => {
-    if (sortBy === "title-az") {
-      return a.title.localeCompare(b.title);
-    }
-    if (sortBy === "rating") {
-      return (b.rating ?? 0) - (a.rating ?? 0);
-    }
-    // date-added: newest first
-    return new Date(b.dateAdded) - new Date(a.dateAdded);
-  });
+  const filteredAndSorted = [...cinemas]
+    .filter((e) => filterType === "All" || e.type === filterType)
+    .filter((e) => filterStatus === "All" || e.status === filterStatus)
+    .sort((a, b) => {
+      if (sortBy === "title-az") return a.title.localeCompare(b.title);
+      if (sortBy === "rating") return (b.rating ?? 0) - (a.rating ?? 0);
+      return new Date(b.dateAdded) - new Date(a.dateAdded);
+    });
 
   function openEditModal(entry) {
     setEditEntry(entry);
@@ -65,30 +65,29 @@ export default function CinemasList({
         {/* Filter pills */}
         <div className="cinemas-filters">
           <div className="cinemas-filter-group">
-            <button type="button" className="cinemas-filter-btn is-active">
-              All
-            </button>
-            <button type="button" className="cinemas-filter-btn">
-              Movie
-            </button>
-            <button type="button" className="cinemas-filter-btn">
-              TV Show
-            </button>
+            {["All", "Movie", "TV Show"].map((type) => (
+              <button
+                key={type}
+                type="button"
+                className={`cinemas-filter-btn${filterType === type ? " is-active" : ""}`}
+                onClick={() => setFilterType(type)}
+              >
+                {type}
+              </button>
+            ))}
           </div>
           <div className="cinemas-filter-divider" />
           <div className="cinemas-filter-group">
-            <button type="button" className="cinemas-filter-btn is-active">
-              All status
-            </button>
-            <button type="button" className="cinemas-filter-btn">
-              Watched
-            </button>
-            <button type="button" className="cinemas-filter-btn">
-              Watching
-            </button>
-            <button type="button" className="cinemas-filter-btn">
-              Want to watch
-            </button>
+            {["All", "Watched", "Watching", "Want to watch"].map((status) => (
+              <button
+                key={status}
+                type="button"
+                className={`cinemas-filter-btn${filterStatus === status ? " is-active" : ""}`}
+                onClick={() => setFilterStatus(status)}
+              >
+                {status === "All" ? "All status" : status}
+              </button>
+            ))}
           </div>
           <button
             type="button"
@@ -101,7 +100,7 @@ export default function CinemasList({
 
         {/* Cards grid */}
         <div className="cinemas-cards">
-          {sortedCinemas.map((entry) => (
+          {filteredAndSorted.map((entry) => (
             <CinemaCard
               entry={entry}
               key={entry.id}
@@ -114,6 +113,11 @@ export default function CinemasList({
           {!cinemas.length && (
             <p className="cinemas-empty-state">
               No entries yet. Add your first film above.
+            </p>
+          )}
+          {cinemas.length > 0 && !filteredAndSorted.length && (
+            <p className="cinemas-empty-state">
+              No entries match the current filters.
             </p>
           )}
         </div>
