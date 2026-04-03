@@ -12,14 +12,19 @@ const STATUS_BADGE_CLASS = {
   "Want to watch": "status-want",
 };
 
-export default function CinemasList({ cinemas, onRemoveAll, onDeleteEntry }) {
+export default function CinemasList({
+  cinemas,
+  onRemoveAll,
+  onDeleteEntry,
+  onEditEntry,
+}) {
   const [modalEntry, setModalEntry] = useState(null);
   const [editEntry, setEditEntry] = useState(null);
   const [editStatus, setEditStatus] = useState("Want to watch");
   const [editRating, setEditRating] = useState(null);
   const [editHoverRating, setEditHoverRating] = useState(0);
 
-  const isEditWatched = editStatus === "watched";
+  const isEditWatched = editStatus === "Watched";
 
   function openEditModal(entry) {
     const statusMap = {
@@ -130,6 +135,7 @@ export default function CinemasList({ cinemas, onRemoveAll, onDeleteEntry }) {
           editRating={editRating}
           setEditHoverRating={setEditHoverRating}
           editHoverRating={editHoverRating}
+          onEditEntry={onEditEntry}
         />
       )}
     </section>
@@ -277,7 +283,30 @@ function EditEntryModal({
   editRating,
   setEditHoverRating,
   editHoverRating,
+  onEditEntry,
 }) {
+  const [editForm, setEditForm] = useState(editEntry || {});
+
+  function handleEditSubmit(e) {
+    e.preventDefault();
+
+    onEditEntry(editEntry.id, editForm);
+
+    closeEditModal();
+  }
+
+  function handleInputChange(e) {
+    setEditForm((entry) => ({
+      ...entry,
+      [e.target.name]: e.target.value,
+    }));
+  }
+
+  function handleStarRating(star) {
+    setEditRating(star);
+    setEditForm((entry) => ({ ...entry, rating: star }));
+  }
+
   return (
     <div className="cinema-modal-overlay" onClick={closeEditModal}>
       <div
@@ -296,20 +325,22 @@ function EditEntryModal({
           </button>
         </div>
 
-        <form className="cinema-edit-form">
+        <form className="cinema-edit-form" onSubmit={handleEditSubmit}>
           <input
             className="cinema-edit-input"
             type="text"
             name="title"
-            defaultValue={editEntry.title}
+            value={editForm?.title || ""}
             placeholder="Title"
+            onChange={handleInputChange}
           />
 
           <div className="cinema-edit-selects">
             <select
               className="cinema-edit-select"
               name="type"
-              defaultValue={editEntry.type === "TV Show" ? "TV Show" : "Movie"}
+              value={editForm?.type || ""}
+              onChange={handleInputChange}
             >
               <option value="Movie">Movie</option>
               <option value="TV Show">TV Show</option>
@@ -317,7 +348,8 @@ function EditEntryModal({
             <select
               className="cinema-edit-select"
               name="genre"
-              defaultValue={editEntry.genre}
+              value={editForm?.genre || ""}
+              onChange={handleInputChange}
             >
               <option value="Action">Action</option>
               <option value="Animation">Animation</option>
@@ -336,6 +368,8 @@ function EditEntryModal({
               onChange={(e) => {
                 setEditStatus(e.target.value);
                 setEditRating(null);
+                setEditForm((entry) => ({ ...entry, rating: null }));
+                handleInputChange(e);
               }}
             >
               <option value="Want to watch">Want to watch</option>
@@ -356,7 +390,7 @@ function EditEntryModal({
                       className={`cinema-edit-star ${
                         star <= (editHoverRating || editRating) ? "active" : ""
                       }`}
-                      onClick={() => setEditRating(star)}
+                      onClick={() => handleStarRating(star)}
                       onMouseEnter={() => setEditHoverRating(star)}
                       onMouseLeave={() => setEditHoverRating(0)}
                       aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
@@ -376,9 +410,10 @@ function EditEntryModal({
                 <textarea
                   className="cinema-edit-textarea"
                   name="comment"
-                  defaultValue={editEntry.comment ?? ""}
+                  value={editForm?.comment || ""}
                   placeholder="What did you think? (optional)"
                   rows={3}
+                  onChange={handleInputChange}
                 />
               </div>
             </div>

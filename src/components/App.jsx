@@ -85,6 +85,12 @@ function App() {
   function handleDeleteEntry(id) {
     setCinemas(cinemas.filter((cinema) => cinema.id !== id));
   }
+
+  function handleEditEntry(id, updatedEntry) {
+    setCinemas((curr) =>
+      curr.map((current) => (current.id === id ? updatedEntry : current)),
+    );
+  }
   return (
     <>
       <Header />
@@ -94,6 +100,7 @@ function App() {
         cinemas={cinemas}
         onRemoveAll={handleRemoveAll}
         onDeleteEntry={handleDeleteEntry}
+        onEditEntry={handleEditEntry}
       />
     </>
   );
