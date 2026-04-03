@@ -112,79 +112,11 @@ export default function CinemasList({ cinemas, onRemoveAll, onDeleteEntry }) {
 
       {/* Detail modal */}
       {modalEntry && (
-        <div
-          className="cinema-modal-overlay"
-          onClick={() => setModalEntry(null)}
-        >
-          <div className="cinema-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="cinema-modal-header">
-              <h2 className="cinema-modal-title">{modalEntry.title}</h2>
-              <button
-                type="button"
-                className="cinema-modal-close"
-                onClick={() => setModalEntry(null)}
-                aria-label="Close"
-              >
-                ×
-              </button>
-            </div>
-            <div className="cinema-modal-tags">
-              <span
-                className={`cinema-badge type-badge ${TYPE_BADGE_CLASS[modalEntry.type] ?? ""}`}
-              >
-                {modalEntry.type}
-              </span>
-              <span
-                className={`cinema-badge status-badge ${STATUS_BADGE_CLASS[modalEntry.status] ?? ""}`}
-              >
-                {modalEntry.status}
-              </span>
-              <span className="cinema-genre-text">{modalEntry.genre}</span>
-            </div>
-            {modalEntry.rating && (
-              <div className="cinema-modal-stars">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <span
-                    key={star}
-                    className={`cinema-star ${star <= modalEntry.rating ? "filled" : "empty"}`}
-                  >
-                    ★
-                  </span>
-                ))}
-                <span className="cinema-modal-rating-label">
-                  {modalEntry.rating}.0 / 5
-                </span>
-              </div>
-            )}
-            <p className="cinema-modal-date">Added {modalEntry.dateAdded}</p>
-            {modalEntry.status === "Watched" && modalEntry.comment && (
-              <div className="cinema-modal-comment">
-                <p className="cinema-modal-comment-label">Thoughts</p>
-                <p className="cinema-modal-comment-text">
-                  {modalEntry.comment}
-                </p>
-              </div>
-            )}
-            {modalEntry.status === "Watched" && !modalEntry.comment && (
-              <p className="cinema-modal-no-comment">
-                No thoughts added for this entry.
-              </p>
-            )}
-            <div className="cinema-modal-footer">
-              <button
-                type="button"
-                className="cinema-modal-edit-btn"
-                onClick={() => {
-                  setModalEntry(null);
-                  openEditModal(modalEntry);
-                }}
-                aria-label="Edit entry"
-              >
-                ✎ Edit Entry
-              </button>
-            </div>
-          </div>
-        </div>
+        <DetailModal
+          modalEntry={modalEntry}
+          setModalEntry={setModalEntry}
+          openEditModal={openEditModal}
+        />
       )}
       {/* Edit modal */}
       {editEntry && (
@@ -371,6 +303,79 @@ function CinemaCard({ entry, setModalEntry, openEditModal, onDeleteEntry }) {
         ))}
       </div>
       <p className="cinema-card-date">Added {entry.dateAdded}</p>
+    </div>
+  );
+}
+
+function DetailModal({ modalEntry, setModalEntry, openEditModal }) {
+  return (
+    <div className="cinema-modal-overlay" onClick={() => setModalEntry(null)}>
+      <div className="cinema-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="cinema-modal-header">
+          <h2 className="cinema-modal-title">{modalEntry.title}</h2>
+          <button
+            type="button"
+            className="cinema-modal-close"
+            onClick={() => setModalEntry(null)}
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+        <div className="cinema-modal-tags">
+          <span
+            className={`cinema-badge type-badge ${TYPE_BADGE_CLASS[modalEntry.type] ?? ""}`}
+          >
+            {modalEntry.type}
+          </span>
+          <span
+            className={`cinema-badge status-badge ${STATUS_BADGE_CLASS[modalEntry.status] ?? ""}`}
+          >
+            {modalEntry.status}
+          </span>
+          <span className="cinema-genre-text">{modalEntry.genre}</span>
+        </div>
+        {modalEntry.rating && (
+          <div className="cinema-modal-stars">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <span
+                key={star}
+                className={`cinema-star ${star <= modalEntry.rating ? "filled" : "empty"}`}
+              >
+                ★
+              </span>
+            ))}
+            <span className="cinema-modal-rating-label">
+              {modalEntry.rating}.0 / 5
+            </span>
+          </div>
+        )}
+        <p className="cinema-modal-date">Added {modalEntry.dateAdded}</p>
+        {modalEntry.status === "Watched" && modalEntry.comment && (
+          <div className="cinema-modal-comment">
+            <p className="cinema-modal-comment-label">Thoughts</p>
+            <p className="cinema-modal-comment-text">{modalEntry.comment}</p>
+          </div>
+        )}
+        {modalEntry.status === "Watched" && !modalEntry.comment && (
+          <p className="cinema-modal-no-comment">
+            No thoughts added for this entry.
+          </p>
+        )}
+        <div className="cinema-modal-footer">
+          <button
+            type="button"
+            className="cinema-modal-edit-btn"
+            onClick={() => {
+              setModalEntry(null);
+              openEditModal(modalEntry);
+            }}
+            aria-label="Edit entry"
+          >
+            ✎ Edit Entry
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
