@@ -20,22 +20,9 @@ export default function CinemasList({
 }) {
   const [modalEntry, setModalEntry] = useState(null);
   const [editEntry, setEditEntry] = useState(null);
-  const [editStatus, setEditStatus] = useState("Want to watch");
-  const [editRating, setEditRating] = useState(null);
-  const [editHoverRating, setEditHoverRating] = useState(0);
-
-  const isEditWatched = editStatus === "Watched";
 
   function openEditModal(entry) {
-    const statusMap = {
-      Watched: "Watched",
-      Watching: "Watching",
-      "Want to watch": "Want to watch",
-    };
     setEditEntry(entry);
-    setEditStatus(statusMap[entry.status] ?? "Want to watch");
-    setEditRating(entry.rating ?? 0);
-    setEditHoverRating(0);
   }
 
   function closeEditModal() {
@@ -126,15 +113,9 @@ export default function CinemasList({
       {/* Edit modal */}
       {editEntry && (
         <EditEntryModal
+          key={editEntry.id}
           closeEditModal={closeEditModal}
           editEntry={editEntry}
-          editStatus={editStatus}
-          setEditStatus={setEditStatus}
-          setEditRating={setEditRating}
-          isEditWatched={isEditWatched}
-          editRating={editRating}
-          setEditHoverRating={setEditHoverRating}
-          editHoverRating={editHoverRating}
           onEditEntry={onEditEntry}
         />
       )}
@@ -273,25 +254,29 @@ function DetailModal({ modalEntry, setModalEntry, openEditModal }) {
   );
 }
 
-function EditEntryModal({
-  closeEditModal,
-  editEntry,
-  editStatus,
-  setEditStatus,
-  setEditRating,
-  isEditWatched,
-  editRating,
-  setEditHoverRating,
-  editHoverRating,
-  onEditEntry,
-}) {
-  const [editForm, setEditForm] = useState(editEntry || {});
+function EditEntryModal({ closeEditModal, editEntry, onEditEntry }) {
+  const [editForm, setEditForm] = useState(editEntry);
+  const [editStatus, setEditStatus] = useState(editEntry.status);
+  const [editRating, setEditRating] = useState(editEntry.rating ?? null);
+  const [editHoverRating, setEditHoverRating] = useState(0);
+  const [errors, setErrors] = useState({});
+
+  const isEditWatched = editStatus === "Watched";
 
   function handleEditSubmit(e) {
     e.preventDefault();
 
-    onEditEntry(editEntry.id, editForm);
+    const newErrors = {};
+    if (!editForm.title.trim()) newErrors.title = "Title is required.";
+    if (isEditWatched && !editRating)
+      newErrors.rating = "Please select a rating.";
 
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    onEditEntry(editEntry.id, editForm);
     closeEditModal();
   }
 
@@ -305,6 +290,7 @@ function EditEntryModal({
   function handleStarRating(star) {
     setEditRating(star);
     setEditForm((entry) => ({ ...entry, rating: star }));
+    if (errors.rating) setErrors((prev) => ({ ...prev, rating: "" }));
   }
 
   return (
@@ -327,19 +313,25 @@ function EditEntryModal({
 
         <form className="cinema-edit-form" onSubmit={handleEditSubmit}>
           <input
-            className="cinema-edit-input"
+            className={`cinema-edit-input${errors.title ? " cinema-edit-input--error" : ""}`}
             type="text"
             name="title"
-            value={editForm?.title || ""}
+            value={editForm.title || ""}
             placeholder="Title"
-            onChange={handleInputChange}
+            onChange={(e) => {
+              handleInputChange(e);
+              if (errors.title) setErrors((prev) => ({ ...prev, title: "" }));
+            }}
           />
+          {errors.title && (
+            <span className="cinema-form-error">{errors.title}</span>
+          )}
 
           <div className="cinema-edit-selects">
             <select
               className="cinema-edit-select"
               name="type"
-              value={editForm?.type || ""}
+              value={editForm.type || ""}
               onChange={handleInputChange}
             >
               <option value="Movie">Movie</option>
@@ -348,7 +340,7 @@ function EditEntryModal({
             <select
               className="cinema-edit-select"
               name="genre"
-              value={editForm?.genre || ""}
+              value={editForm.genre || ""}
               onChange={handleInputChange}
             >
               <option value="Action">Action</option>
@@ -366,10 +358,15 @@ function EditEntryModal({
               name="status"
               value={editStatus}
               onChange={(e) => {
-                setEditStatus(e.target.value);
+                const newStatus = e.target.value;
+                setEditStatus(newStatus);
                 setEditRating(null);
-                setEditForm((entry) => ({ ...entry, rating: null }));
-                handleInputChange(e);
+                setEditForm((entry) => ({
+                  ...entry,
+                  status: newStatus,
+                  rating: null,
+                  comment: newStatus === "Watched" ? entry.comment : null,
+                }));
               }}
             >
               <option value="Want to watch">Want to watch</option>
@@ -404,13 +401,16 @@ function EditEntryModal({
                     </span>
                   )}
                 </div>
+                {errors.rating && (
+                  <span className="cinema-form-error">{errors.rating}</span>
+                )}
               </div>
               <div className="cinema-edit-comment">
                 <span className="cinema-edit-field-label">Your thoughts</span>
                 <textarea
                   className="cinema-edit-textarea"
                   name="comment"
-                  value={editForm?.comment || ""}
+                  value={editForm.comment || ""}
                   placeholder="What did you think? (optional)"
                   rows={3}
                   onChange={handleInputChange}
