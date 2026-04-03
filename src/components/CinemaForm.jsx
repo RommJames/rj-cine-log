@@ -9,13 +9,21 @@ export default function CinemaForm({ onAddCinemas }) {
   const [rating, setRating] = useState(null);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
+  const [errors, setErrors] = useState({});
 
   const isWatched = status === "Watched";
 
   function handleOnSubmit(e) {
     e.preventDefault();
 
-    if (!title) return;
+    const newErrors = {};
+    if (!title.trim()) newErrors.title = "Title is required.";
+    if (isWatched && !rating) newErrors.rating = "Please select a rating.";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
 
     const newCinema = {
       id: crypto.randomUUID(),
@@ -40,6 +48,7 @@ export default function CinemaForm({ onAddCinemas }) {
     setStatus("Want to watch");
     setRating(null);
     setComment("");
+    setErrors({});
   }
 
   return (
@@ -48,14 +57,23 @@ export default function CinemaForm({ onAddCinemas }) {
         <p className="cinema-form-heading">Add entry</p>
         <form className="cinema-form" onSubmit={handleOnSubmit}>
           <div className="cinema-form-row">
-            <input
-              className="cinema-form-input"
-              type="text"
-              placeholder="Title (e.g. Interstellar)"
-              name="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
+            <div className="cinema-form-field">
+              <input
+                className={`cinema-form-input${errors.title ? " cinema-form-input--error" : ""}`}
+                type="text"
+                placeholder="Title (e.g. Interstellar)"
+                name="title"
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  if (errors.title)
+                    setErrors((prev) => ({ ...prev, title: "" }));
+                }}
+              />
+              {errors.title && (
+                <span className="cinema-form-error">{errors.title}</span>
+              )}
+            </div>
             <select
               className="cinema-form-select"
               name="type"
@@ -114,7 +132,11 @@ export default function CinemaForm({ onAddCinemas }) {
                       className={`cinema-form-star ${
                         star <= (hoverRating || rating) ? "active" : ""
                       }`}
-                      onClick={() => setRating(star)}
+                      onClick={() => {
+                        setRating(star);
+                        if (errors.rating)
+                          setErrors((prev) => ({ ...prev, rating: "" }));
+                      }}
                       onMouseEnter={() => setHoverRating(star)}
                       onMouseLeave={() => setHoverRating(0)}
                       aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
@@ -126,6 +148,9 @@ export default function CinemaForm({ onAddCinemas }) {
                     <span className="cinema-form-rating-label">{rating}.0</span>
                   )}
                 </div>
+                {errors.rating && (
+                  <span className="cinema-form-error">{errors.rating}</span>
+                )}
               </div>
               <div className="cinema-form-comment">
                 <span className="cinema-form-field-label">Your thoughts</span>
