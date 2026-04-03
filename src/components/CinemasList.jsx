@@ -20,6 +20,18 @@ export default function CinemasList({
 }) {
   const [modalEntry, setModalEntry] = useState(null);
   const [editEntry, setEditEntry] = useState(null);
+  const [sortBy, setSortBy] = useState("date-added");
+
+  const sortedCinemas = [...cinemas].sort((a, b) => {
+    if (sortBy === "title-az") {
+      return a.title.localeCompare(b.title);
+    }
+    if (sortBy === "rating") {
+      return (b.rating ?? 0) - (a.rating ?? 0);
+    }
+    // date-added: newest first
+    return new Date(b.dateAdded) - new Date(a.dateAdded);
+  });
 
   function openEditModal(entry) {
     setEditEntry(entry);
@@ -37,7 +49,12 @@ export default function CinemasList({
           <h2 className="cinemas-list-title">Entries</h2>
           <div className="cinemas-sort-control">
             <span className="cinemas-sort-label">Sort:</span>
-            <select className="cinemas-sort-select" name="sort">
+            <select
+              className="cinemas-sort-select"
+              name="sort"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
               <option value="date-added">Date added</option>
               <option value="title-az">Title A–Z</option>
               <option value="rating">Rating</option>
@@ -84,7 +101,7 @@ export default function CinemasList({
 
         {/* Cards grid */}
         <div className="cinemas-cards">
-          {cinemas.map((entry) => (
+          {sortedCinemas.map((entry) => (
             <CinemaCard
               entry={entry}
               key={entry.id}
