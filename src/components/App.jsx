@@ -77,12 +77,24 @@ function App() {
     setCinemas([addItems, ...cinemas]);
   }
 
+  function handleRemoveAll() {
+    if (window.confirm("Clear all entries? This cannot be undone.")) {
+      setCinemas([]);
+    }
+  }
+  function handleDeleteEntry(id) {
+    setCinemas(cinemas.filter((cinema) => cinema.id !== id));
+  }
   return (
     <>
       <Header />
       <WatchSummary cinemas={cinemas} />
       <CinemaForm onAddCinemas={handleAddCinemas} />
-      <CinemasList cinemas={cinemas} />
+      <CinemasList
+        cinemas={cinemas}
+        onRemoveAll={handleRemoveAll}
+        onDeleteEntry={handleDeleteEntry}
+      />
     </>
   );
 }

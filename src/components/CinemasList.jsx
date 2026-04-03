@@ -12,7 +12,7 @@ const STATUS_BADGE_CLASS = {
   "Want to watch": "status-want",
 };
 
-export default function CinemasList({ cinemas }) {
+export default function CinemasList({ cinemas, onRemoveAll, onDeleteEntry }) {
   const [modalEntry, setModalEntry] = useState(null);
   const [editEntry, setEditEntry] = useState(null);
   const [editStatus, setEditStatus] = useState("want-to-watch");
@@ -81,7 +81,11 @@ export default function CinemasList({ cinemas }) {
               Want to watch
             </button>
           </div>
-          <button type="button" className="cinemas-reset-btn">
+          <button
+            type="button"
+            className="cinemas-reset-btn"
+            onClick={onRemoveAll}
+          >
             Reset
           </button>
         </div>
@@ -94,6 +98,7 @@ export default function CinemasList({ cinemas }) {
               key={entry.id}
               setModalEntry={setModalEntry}
               openEditModal={openEditModal}
+              onDeleteEntry={onDeleteEntry}
             />
           ))}
 
@@ -312,7 +317,7 @@ export default function CinemasList({ cinemas }) {
   );
 }
 
-function CinemaCard({ entry, setModalEntry, openEditModal }) {
+function CinemaCard({ entry, setModalEntry, openEditModal, onDeleteEntry }) {
   return (
     <div className="cinema-card">
       <div className="cinema-card-top">
@@ -336,6 +341,7 @@ function CinemaCard({ entry, setModalEntry, openEditModal }) {
             type="button"
             className="cinema-action-btn cinema-delete-btn"
             aria-label="Delete entry"
+            onClick={() => onDeleteEntry(entry.id)}
           >
             ×
           </button>
