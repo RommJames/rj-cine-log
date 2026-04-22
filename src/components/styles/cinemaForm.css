@@ -63,12 +63,45 @@
   border-color: #e05252;
 }
 
+.cinema-form-input--loading {
+  padding-right: 38px;
+}
+
+/* Spinner overlay */
+.cinema-form-input-spinner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 2.4rem;
+  width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.cinema-form-spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(234, 192, 68, 0.25);
+  border-top-color: #eac044;
+  border-radius: 50%;
+  animation: cinema-spin 0.7s linear infinite;
+}
+
+@keyframes cinema-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .cinema-form-input--error:focus {
   border-color: #e05252;
   box-shadow: 0 0 0 3px rgba(224, 82, 82, 0.18);
 }
 
 .cinema-form-field {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -255,4 +288,160 @@
 .cinema-form-textarea:focus {
   border-color: #eac044;
   box-shadow: 0 0 0 3px rgba(234, 192, 68, 0.18);
+}
+
+/* Search fetch error */
+.cinema-form-search-error {
+  position: absolute;
+  top: calc(2.4rem + 4px);
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #252528;
+  border: 1px solid rgba(224, 82, 82, 0.3);
+  border-radius: 10px;
+  z-index: 200;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  animation: rec-fade-in 0.15s ease;
+}
+
+.cinema-form-search-error-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  color: #e05252;
+}
+
+.cinema-form-search-error-text {
+  font-family: "Roboto", sans-serif;
+  font-size: 0.85rem;
+  color: #e07a7a;
+}
+
+/* Recommendation dropdown */
+.cinema-form-recommendations {
+  position: absolute;
+  top: calc(2.4rem + 4px);
+  left: 0;
+  right: 0;
+  background: #252528;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  z-index: 200;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  max-height: 272px;
+  overflow-y: auto;
+  animation: rec-fade-in 0.15s ease;
+}
+
+.cinema-form-recommendations::-webkit-scrollbar {
+  width: 4px;
+}
+
+.cinema-form-recommendations::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cinema-form-recommendations::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+@keyframes rec-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cinema-form-rec-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.cinema-form-rec-item:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+.cinema-form-rec-poster {
+  width: 36px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.cinema-form-rec-poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+.cinema-form-rec-poster-fallback {
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(245, 247, 251, 0.25);
+  user-select: none;
+}
+
+.cinema-form-rec-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.cinema-form-rec-title {
+  font-family: "Roboto", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #f5f7fb;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cinema-form-rec-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cinema-form-rec-year {
+  font-family: "Roboto", sans-serif;
+  font-size: 0.72rem;
+  color: #9e9e9e;
+}
+
+.cinema-form-rec-badge {
+  font-family: "Fjalla One", sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(234, 192, 68, 0.12);
+  color: #eac044;
+  border: 1px solid rgba(234, 192, 68, 0.2);
 }

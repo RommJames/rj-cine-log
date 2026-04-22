@@ -1,5 +1,9 @@
 import { useState } from "react";
 import "./styles/cinemaForm.css";
+import { useSearchMovies } from "../hooks/useSearchMovies";
+import SearchMovieList from "./SearchMovieList";
+import SearchError from "./SearchError";
+import Spinner from "./Spinner";
 
 export default function CinemaForm({ onAddCinemas }) {
   const [title, setTitle] = useState("");
@@ -10,6 +14,7 @@ export default function CinemaForm({ onAddCinemas }) {
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
   const [errors, setErrors] = useState({});
+  const { searchMovies, isSearching, searchError } = useSearchMovies(title);
 
   const isWatched = status === "Watched";
 
@@ -59,7 +64,7 @@ export default function CinemaForm({ onAddCinemas }) {
           <div className="cinema-form-row">
             <div className="cinema-form-field">
               <input
-                className={`cinema-form-input${errors.title ? " cinema-form-input--error" : ""}`}
+                className={`cinema-form-input${errors.title ? " cinema-form-input--error" : ""}${isSearching ? " cinema-form-input--loading" : ""}`}
                 type="text"
                 placeholder="Title (e.g. Interstellar)"
                 name="title"
@@ -70,9 +75,14 @@ export default function CinemaForm({ onAddCinemas }) {
                     setErrors((prev) => ({ ...prev, title: "" }));
                 }}
               />
+              {isSearching && <Spinner />}
               {errors.title && (
                 <span className="cinema-form-error">{errors.title}</span>
               )}
+              {!isSearching && !searchError && searchMovies.length > 0 && (
+                <SearchMovieList searchMovies={searchMovies} />
+              )}
+              {searchError && <SearchError searchError={searchError} />}
             </div>
             <select
               className="cinema-form-select"
