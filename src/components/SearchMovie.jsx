@@ -1,6 +1,9 @@
-export default function SearchMovie({ rec }) {
+export default function SearchMovie({ rec, onClickSearchMovie }) {
   return (
-    <li key={rec.imdbId} className="cinema-form-rec-item">
+    <li
+      className="cinema-form-rec-item"
+      onClick={() => onClickSearchMovie(rec.imdbID)}
+    >
       <div className="cinema-form-rec-poster">
         {rec.Poster && rec.Poster !== "N/A" ? (
           <img

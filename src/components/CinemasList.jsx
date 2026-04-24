@@ -12,6 +12,28 @@ const STATUS_BADGE_CLASS = {
   "Want to watch": "status-want",
 };
 
+const GENRE_OPTIONS = [
+  "Action",
+  "Animation",
+  "Comedy",
+  "Documentary",
+  "Drama",
+  "Horror",
+  "Romance",
+  "Sci-Fi",
+  "Thriller",
+];
+
+function hasPosterImage(poster) {
+  return Boolean(poster && poster !== "N/A");
+}
+
+function PosterFallback({ title, className }) {
+  const fallbackChar = title?.trim()?.charAt(0)?.toUpperCase() || "?";
+
+  return <span className={className}>{fallbackChar}</span>;
+}
+
 export default function CinemasList({
   cinemas,
   onRemoveAll,
@@ -147,62 +169,88 @@ export default function CinemasList({
 function CinemaCard({ entry, setModalEntry, openEditModal, onDeleteEntry }) {
   return (
     <div className="cinema-card">
-      <div className="cinema-card-top">
-        <button
-          type="button"
-          className="cinema-card-title-btn"
-          onClick={() => setModalEntry(entry)}
-        >
-          {entry.title}
-        </button>
-        <div className="cinema-card-actions">
-          <button
-            type="button"
-            className="cinema-action-btn cinema-edit-btn"
-            onClick={() => openEditModal(entry)}
-            aria-label="Edit entry"
-          >
-            ✎
-          </button>
-          <button
-            type="button"
-            className="cinema-action-btn cinema-delete-btn"
-            aria-label="Delete entry"
-            onClick={() => onDeleteEntry(entry.id)}
-          >
-            ×
-          </button>
+      <div className="cinema-card-layout">
+        <div className="cinema-card-poster-wrap">
+          {hasPosterImage(entry.poster) ? (
+            <img
+              className="cinema-card-poster-img"
+              src={entry.poster}
+              alt={entry.title}
+            />
+          ) : (
+            <PosterFallback
+              title={entry.title}
+              className="cinema-card-poster-fallback"
+            />
+          )}
+        </div>
+
+        <div className="cinema-card-content">
+          <div className="cinema-card-top">
+            <button
+              type="button"
+              className="cinema-card-title-btn"
+              onClick={() => setModalEntry(entry)}
+            >
+              {entry.title}
+            </button>
+            <div className="cinema-card-actions">
+              <button
+                type="button"
+                className="cinema-action-btn cinema-edit-btn"
+                onClick={() => openEditModal(entry)}
+                aria-label="Edit entry"
+              >
+                ✎
+              </button>
+              <button
+                type="button"
+                className="cinema-action-btn cinema-delete-btn"
+                aria-label="Delete entry"
+                onClick={() => onDeleteEntry(entry.id)}
+              >
+                ×
+              </button>
+            </div>
+          </div>
+          <div className="cinema-card-tags">
+            <span
+              className={`cinema-badge type-badge ${TYPE_BADGE_CLASS[entry.type] ?? ""}`}
+            >
+              {entry.type}
+            </span>
+            <span
+              className={`cinema-badge status-badge ${STATUS_BADGE_CLASS[entry.status] ?? ""}`}
+            >
+              {entry.status}
+            </span>
+            <span className="cinema-genre-text">{entry.genre}</span>
+          </div>
+          <div className="cinema-card-stars">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <span
+                key={star}
+                className={`cinema-star ${entry.rating && star <= entry.rating ? "filled" : "empty"}`}
+              >
+                ★
+              </span>
+            ))}
+          </div>
+          <p className="cinema-card-date">Added {entry.dateAdded}</p>
         </div>
       </div>
-      <div className="cinema-card-tags">
-        <span
-          className={`cinema-badge type-badge ${TYPE_BADGE_CLASS[entry.type] ?? ""}`}
-        >
-          {entry.type}
-        </span>
-        <span
-          className={`cinema-badge status-badge ${STATUS_BADGE_CLASS[entry.status] ?? ""}`}
-        >
-          {entry.status}
-        </span>
-        <span className="cinema-genre-text">{entry.genre}</span>
-      </div>
-      <div className="cinema-card-stars">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <span
-            key={star}
-            className={`cinema-star ${entry.rating && star <= entry.rating ? "filled" : "empty"}`}
-          >
-            ★
-          </span>
-        ))}
-      </div>
-      <p className="cinema-card-date">Added {entry.dateAdded}</p>
     </div>
   );
 }
 
 function DetailModal({ modalEntry, setModalEntry, openEditModal }) {
+  const hasDetails =
+    modalEntry.year ||
+    modalEntry.runtime ||
+    modalEntry.director ||
+    modalEntry.plot ||
+    modalEntry.imdbRating;
+
   return (
     <div className="cinema-modal-overlay" onClick={() => setModalEntry(null)}>
       <div className="cinema-modal" onClick={(e) => e.stopPropagation()}>
@@ -230,6 +278,60 @@ function DetailModal({ modalEntry, setModalEntry, openEditModal }) {
           </span>
           <span className="cinema-genre-text">{modalEntry.genre}</span>
         </div>
+
+        <div className="cinema-modal-details-layout">
+          <div className="cinema-modal-poster-wrap">
+            {hasPosterImage(modalEntry.poster) ? (
+              <img
+                className="cinema-modal-poster-img"
+                src={modalEntry.poster}
+                alt={modalEntry.title}
+              />
+            ) : (
+              <PosterFallback
+                title={modalEntry.title}
+                className="cinema-modal-poster-fallback"
+              />
+            )}
+          </div>
+
+          <div className="cinema-modal-details-content">
+            <div className="cinema-modal-meta-pills">
+              {modalEntry.year && (
+                <span className="cinema-modal-meta-pill">
+                  {modalEntry.year}
+                </span>
+              )}
+              {modalEntry.runtime && (
+                <span className="cinema-modal-meta-pill">
+                  {modalEntry.runtime}
+                </span>
+              )}
+              {modalEntry.imdbRating && (
+                <span className="cinema-modal-meta-pill">
+                  IMDb {modalEntry.imdbRating}
+                </span>
+              )}
+            </div>
+
+            {modalEntry.director && (
+              <p className="cinema-modal-detail-line">
+                Directed by {modalEntry.director}
+              </p>
+            )}
+
+            {modalEntry.plot && (
+              <p className="cinema-modal-plot">{modalEntry.plot}</p>
+            )}
+
+            {!hasDetails && (
+              <p className="cinema-modal-no-details">
+                No extra details available for this entry.
+              </p>
+            )}
+          </div>
+        </div>
+
         {modalEntry.rating && (
           <div className="cinema-modal-stars">
             {[1, 2, 3, 4, 5].map((star) => (
@@ -281,6 +383,9 @@ function EditEntryModal({ closeEditModal, editEntry, onEditEntry }) {
   const [editRating, setEditRating] = useState(editEntry.rating ?? null);
   const [editHoverRating, setEditHoverRating] = useState(0);
   const [errors, setErrors] = useState({});
+  const isSearchLocked = Boolean(editEntry.isSearchBased || editEntry.imdbID);
+  const hasCustomGenreOption =
+    editForm.genre && !GENRE_OPTIONS.includes(editForm.genre);
 
   const isEditWatched = editStatus === "Watched";
 
@@ -339,6 +444,7 @@ function EditEntryModal({ closeEditModal, editEntry, onEditEntry }) {
             name="title"
             value={editForm.title || ""}
             placeholder="Title"
+            disabled={isSearchLocked}
             onChange={(e) => {
               handleInputChange(e);
               if (errors.title) setErrors((prev) => ({ ...prev, title: "" }));
@@ -353,6 +459,7 @@ function EditEntryModal({ closeEditModal, editEntry, onEditEntry }) {
               className="cinema-edit-select"
               name="type"
               value={editForm.type || ""}
+              disabled={isSearchLocked}
               onChange={handleInputChange}
             >
               <option value="Movie">Movie</option>
@@ -362,17 +469,17 @@ function EditEntryModal({ closeEditModal, editEntry, onEditEntry }) {
               className="cinema-edit-select"
               name="genre"
               value={editForm.genre || ""}
+              disabled={isSearchLocked}
               onChange={handleInputChange}
             >
-              <option value="Action">Action</option>
-              <option value="Animation">Animation</option>
-              <option value="Comedy">Comedy</option>
-              <option value="Documentary">Documentary</option>
-              <option value="Drama">Drama</option>
-              <option value="Horror">Horror</option>
-              <option value="Romance">Romance</option>
-              <option value="Sci-Fi">Sci-Fi</option>
-              <option value="Thriller">Thriller</option>
+              {hasCustomGenreOption && (
+                <option value={editForm.genre}>{editForm.genre}</option>
+              )}
+              {GENRE_OPTIONS.map((genreOption) => (
+                <option key={genreOption} value={genreOption}>
+                  {genreOption}
+                </option>
+              ))}
             </select>
             <select
               className="cinema-edit-select"
@@ -395,6 +502,12 @@ function EditEntryModal({ closeEditModal, editEntry, onEditEntry }) {
               <option value="Watched">Watched</option>
             </select>
           </div>
+
+          {isSearchLocked && (
+            <p className="cinema-edit-lock-note">
+              Title, type, and genre are locked for search-imported entries.
+            </p>
+          )}
 
           {isEditWatched && (
             <div className="cinema-edit-watched-section">

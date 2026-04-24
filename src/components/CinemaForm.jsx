@@ -4,17 +4,93 @@ import { useSearchMovies } from "../hooks/useSearchMovies";
 import SearchMovieList from "./SearchMovieList";
 import SearchError from "./SearchError";
 import Spinner from "./Spinner";
+import { useMovieDetails } from "../hooks/useMovieDetails";
+import MovieDetailPreview from "./MovieDetailPreview";
+
+const DEFAULT_GENRE = "Action";
+const FALLBACK_TYPE = "Movie";
+
+const SUPPORTED_GENRES = [
+  "Action",
+  "Comedy",
+  "Drama",
+  "Horror",
+  "Sci-Fi",
+  "Thriller",
+  "Romance",
+  "Animation",
+  "Documentary",
+];
+
+function normalizeType(type) {
+  return type === "series" ? "TV Show" : "Movie";
+}
+
+function getPrimaryGenre(movieGenres) {
+  if (!movieGenres) return DEFAULT_GENRE;
+
+  const aliases = {
+    "science fiction": "Sci-Fi",
+  };
+
+  const parsedGenres = movieGenres
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  const matchedSupported = parsedGenres.find((item) => {
+    const normalized = aliases[item.toLowerCase()] || item;
+    return SUPPORTED_GENRES.includes(normalized);
+  });
+
+  if (matchedSupported) {
+    return aliases[matchedSupported.toLowerCase()] || matchedSupported;
+  }
+
+  return parsedGenres[0] || DEFAULT_GENRE;
+}
+
+function cleanMovieField(value) {
+  if (!value || value === "N/A") return null;
+  return value;
+}
 
 export default function CinemaForm({ onAddCinemas }) {
   const [title, setTitle] = useState("");
-  const [cinemaType, setCinemaType] = useState("Movie");
-  const [genre, setGenre] = useState("Action");
+  const [cinemaType, setCinemaType] = useState(FALLBACK_TYPE);
+  const [genre, setGenre] = useState(DEFAULT_GENRE);
   const [status, setStatus] = useState("Want to watch");
   const [rating, setRating] = useState(null);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
   const [errors, setErrors] = useState({});
+  const [selectedMovieId, setSelectedMovieId] = useState(null);
+
   const { searchMovies, isSearching, searchError } = useSearchMovies(title);
+  const { movieDetail, isLoading, movieDetailError } =
+    useMovieDetails(selectedMovieId);
+  const selectedSearchMovie = searchMovies.find(
+    (movie) => movie.imdbID === selectedMovieId,
+  );
+  const isMovieSelected = Boolean(selectedMovieId);
+  const selectedTitle = isMovieSelected
+    ? movieDetail?.Title || selectedSearchMovie?.Title || title
+    : title;
+  const selectedCinemaType =
+    isMovieSelected && movieDetail?.Type
+      ? normalizeType(movieDetail.Type)
+      : cinemaType;
+  const selectedGenre =
+    isMovieSelected && movieDetail?.Genre
+      ? getPrimaryGenre(movieDetail.Genre)
+      : genre;
+  const hasCustomGenreOption =
+    isMovieSelected &&
+    selectedGenre &&
+    !SUPPORTED_GENRES.includes(selectedGenre);
+  const selectedPoster =
+    cleanMovieField(movieDetail?.Poster) ||
+    cleanMovieField(selectedSearchMovie?.Poster);
 
   const isWatched = status === "Watched";
 
@@ -32,11 +108,19 @@ export default function CinemaForm({ onAddCinemas }) {
 
     const newCinema = {
       id: crypto.randomUUID(),
-      title,
-      type: cinemaType,
-      genre,
+      title: selectedTitle,
+      type: selectedCinemaType,
+      genre: selectedGenre,
       status,
       rating,
+      poster: selectedPoster,
+      imdbID: isMovieSelected ? selectedMovieId : null,
+      isSearchBased: isMovieSelected,
+      year: cleanMovieField(movieDetail?.Year) || cleanMovieField(selectedSearchMovie?.Year),
+      runtime: cleanMovieField(movieDetail?.Runtime),
+      director: cleanMovieField(movieDetail?.Director),
+      imdbRating: cleanMovieField(movieDetail?.imdbRating),
+      plot: cleanMovieField(movieDetail?.Plot),
       dateAdded: new Date().toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
@@ -48,12 +132,33 @@ export default function CinemaForm({ onAddCinemas }) {
     onAddCinemas(newCinema);
 
     setTitle("");
-    setCinemaType("Movie");
-    setGenre("Action");
+    setCinemaType(FALLBACK_TYPE);
+    setGenre(DEFAULT_GENRE);
     setStatus("Want to watch");
     setRating(null);
     setComment("");
+    setSelectedMovieId(null);
     setErrors({});
+  }
+
+  function handleClickSearchMovie(selectedId) {
+    setSelectedMovieId(selectedId);
+
+    const selectedMovie = searchMovies.find(
+      (movie) => movie.imdbID === selectedId,
+    );
+
+    if (selectedMovie) {
+      setTitle(selectedMovie.Title);
+      setCinemaType(normalizeType(selectedMovie.Type));
+    }
+  }
+
+  function handleClearSelectedMovie() {
+    setSelectedMovieId(null);
+    setCinemaType(FALLBACK_TYPE);
+    setGenre(DEFAULT_GENRE);
+    setTitle("");
   }
 
   return (
@@ -64,30 +169,40 @@ export default function CinemaForm({ onAddCinemas }) {
           <div className="cinema-form-row">
             <div className="cinema-form-field">
               <input
-                className={`cinema-form-input${errors.title ? " cinema-form-input--error" : ""}${isSearching ? " cinema-form-input--loading" : ""}`}
+                className={`cinema-form-input${errors.title ? " cinema-form-input--error" : ""}${isSearching && !isMovieSelected ? " cinema-form-input--loading" : ""}`}
                 type="text"
                 placeholder="Title (e.g. Interstellar)"
                 name="title"
                 value={title}
                 onChange={(e) => {
                   setTitle(e.target.value);
+                  setSelectedMovieId(null);
                   if (errors.title)
                     setErrors((prev) => ({ ...prev, title: "" }));
                 }}
               />
-              {isSearching && <Spinner />}
+              {isSearching && !isMovieSelected && <Spinner />}
               {errors.title && (
                 <span className="cinema-form-error">{errors.title}</span>
               )}
-              {!isSearching && !searchError && searchMovies.length > 0 && (
-                <SearchMovieList searchMovies={searchMovies} />
+              {!isMovieSelected &&
+                !isSearching &&
+                !searchError &&
+                searchMovies.length > 0 && (
+                  <SearchMovieList
+                    searchMovies={searchMovies}
+                    onClickSearchMovie={handleClickSearchMovie}
+                  />
+                )}
+              {!isMovieSelected && searchError && (
+                <SearchError searchError={searchError} />
               )}
-              {searchError && <SearchError searchError={searchError} />}
             </div>
             <select
               className="cinema-form-select"
               name="type"
-              value={cinemaType}
+              value={selectedCinemaType}
+              disabled={isMovieSelected}
               onChange={(e) => setCinemaType(e.target.value)}
             >
               <option value="Movie">Movie</option>
@@ -96,21 +211,21 @@ export default function CinemaForm({ onAddCinemas }) {
             <select
               className="cinema-form-select"
               name="genre"
-              value={genre}
+              value={selectedGenre}
+              disabled={isMovieSelected}
               onChange={(e) => setGenre(e.target.value)}
             >
               <option value="" disabled>
                 Genre
               </option>
-              <option value="Action">Action</option>
-              <option value="Comedy">Comedy</option>
-              <option value="Drama">Drama</option>
-              <option value="Horror">Horror</option>
-              <option value="Sci-Fi">Sci-Fi</option>
-              <option value="Thriller">Thriller</option>
-              <option value="Romance">Romance</option>
-              <option value="Animation">Animation</option>
-              <option value="Documentary">Documentary</option>
+              {hasCustomGenreOption && (
+                <option value={selectedGenre}>{selectedGenre}</option>
+              )}
+              {SUPPORTED_GENRES.map((supportedGenre) => (
+                <option key={supportedGenre} value={supportedGenre}>
+                  {supportedGenre}
+                </option>
+              ))}
             </select>
             <select
               className="cinema-form-select"
@@ -125,10 +240,25 @@ export default function CinemaForm({ onAddCinemas }) {
               <option value="Watching">Watching</option>
               <option value="Watched">Watched</option>
             </select>
+            {isMovieSelected && (
+              <button
+                type="button"
+                className="cinema-form-btn cinema-form-btn--subtle"
+                onClick={handleClearSelectedMovie}
+              >
+                Clear selection
+              </button>
+            )}
             <button type="submit" className="cinema-form-btn">
               + Add
             </button>
           </div>
+
+          <MovieDetailPreview
+            movieDetail={movieDetail}
+            isLoading={isLoading}
+            movieDetailError={movieDetailError}
+          />
 
           {isWatched && (
             <div className="cinema-form-watched-row">
