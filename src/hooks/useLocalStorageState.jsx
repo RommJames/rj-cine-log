@@ -4,7 +4,14 @@ export function useLocalStorageState(initialState, key) {
   const [value, setValue] = useState(function () {
     const storedValue = localStorage.getItem(key);
 
-    return JSON.parse(storedValue) || initialState;
+    if (storedValue === null) return initialState;
+
+    try {
+      return JSON.parse(storedValue) || initialState;
+    } catch {
+      localStorage.removeItem(key);
+      return initialState;
+    }
   });
 
   useEffect(
