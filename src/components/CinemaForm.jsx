@@ -174,6 +174,7 @@ export default function CinemaForm({ onAddCinemas }) {
                 placeholder="Title (e.g. Interstellar)"
                 name="title"
                 value={title}
+                disabled={isMovieSelected}
                 onChange={(e) => {
                   setTitle(e.target.value);
                   setSelectedMovieId(null);
