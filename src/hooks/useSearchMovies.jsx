@@ -24,7 +24,8 @@ export function useSearchMovies(query) {
 
           const data = await res.json();
 
-          if (data.Response === "False") throw new Error("Movie not found");
+          if (data.Response === "False")
+            throw new Error(data.Error || "Movie not found");
 
           setSearchMovies(data.Search);
           setSearchError("");
