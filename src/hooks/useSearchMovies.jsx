@@ -41,12 +41,16 @@ export function useSearchMovies(query) {
         setSearchMovies([]);
         setSearchError("");
         setIsSearching(false);
+        setIsSearching(false);
         return;
       }
 
-      fetchMovies();
+      const timeoutId = setTimeout(() => {
+        fetchMovies();
+      }, 400);
 
       return function () {
+        clearTimeout(timeoutId);
         controller.abort();
       };
     },
