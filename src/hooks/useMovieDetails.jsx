@@ -37,7 +37,6 @@ export function useMovieDetails(selectedId) {
           setMovieDetailError("");
         } catch (error) {
           if (error.name !== "AbortError") {
-            console.log(error.message);
             setMovieDetail(null);
             setMovieDetailError(error.message);
           }
