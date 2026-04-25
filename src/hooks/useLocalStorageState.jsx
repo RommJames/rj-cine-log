@@ -2,21 +2,29 @@ import { useState, useEffect } from "react";
 
 export function useLocalStorageState(initialState, key) {
   const [value, setValue] = useState(function () {
-    const storedValue = localStorage.getItem(key);
-
-    if (storedValue === null) return initialState;
-
     try {
-      return JSON.parse(storedValue);
+      const storedValue = localStorage.getItem(key);
+
+      if (storedValue === null) return initialState;
+
+      try {
+        return JSON.parse(storedValue) || initialState;
+      } catch {
+        try {
+          localStorage.removeItem(key);
+        } catch {}
+        return initialState;
+      }
     } catch {
-      localStorage.removeItem(key);
       return initialState;
     }
   });
 
   useEffect(
     function () {
-      localStorage.setItem(key, JSON.stringify(value));
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch {}
     },
     [value, key],
   );
