@@ -7,7 +7,7 @@ export function useLocalStorageState(initialState, key) {
     if (storedValue === null) return initialState;
 
     try {
-      return JSON.parse(storedValue) || initialState;
+      return JSON.parse(storedValue);
     } catch {
       localStorage.removeItem(key);
       return initialState;
