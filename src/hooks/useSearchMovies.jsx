@@ -26,12 +26,10 @@ export function useSearchMovies(query) {
 
           if (data.Response === "False") throw new Error("Movie not found");
 
-          console.log(data);
           setSearchMovies(data.Search);
           setSearchError("");
         } catch (error) {
           if (error.name !== "AbortError") {
-            console.log(error.message);
             setSearchError(error.message);
           }
         } finally {
