@@ -37,10 +37,9 @@ export function useSearchMovies(query) {
         }
       }
 
-      if (query.length < 3) {
+      if (query.trim().length < 3) {
         setSearchMovies([]);
         setSearchError("");
-        setIsSearching(false);
         setIsSearching(false);
         return;
       }
