@@ -31,7 +31,8 @@ export function useMovieDetails(selectedId) {
 
           const data = await res.json();
 
-          if (data.Response === "False") throw new Error("Movie not found");
+          if (data.Response === "False")
+            throw new Error(data.Error || "Movie not found");
 
           setMovieDetail(data);
           setMovieDetailError("");
