@@ -65,6 +65,8 @@ export default function CinemaForm({ onAddCinemas }) {
   const [comment, setComment] = useState("");
   const [errors, setErrors] = useState({});
   const [selectedMovieId, setSelectedMovieId] = useState(null);
+  const [selectedSearchMovieSummary, setSelectedSearchMovieSummary] =
+    useState(null);
 
   const isMovieSelected = Boolean(selectedMovieId);
   const { searchMovies, isSearching, searchError } = useSearchMovies(
@@ -72,9 +74,9 @@ export default function CinemaForm({ onAddCinemas }) {
   );
   const { movieDetail, isLoading, movieDetailError } =
     useMovieDetails(selectedMovieId);
-  const selectedSearchMovie = searchMovies.find(
-    (movie) => movie.imdbID === selectedMovieId,
-  );
+  const selectedSearchMovie =
+    searchMovies.find((movie) => movie.imdbID === selectedMovieId) ||
+    selectedSearchMovieSummary;
   const selectedTitle = isMovieSelected
     ? movieDetail?.Title || selectedSearchMovie?.Title || title
     : title;
@@ -140,6 +142,7 @@ export default function CinemaForm({ onAddCinemas }) {
     setRating(null);
     setComment("");
     setSelectedMovieId(null);
+    setSelectedSearchMovieSummary(null);
     setErrors({});
   }
 
@@ -151,6 +154,7 @@ export default function CinemaForm({ onAddCinemas }) {
     );
 
     if (selectedMovie) {
+      setSelectedSearchMovieSummary(selectedMovie);
       setTitle(selectedMovie.Title);
       setCinemaType(normalizeType(selectedMovie.Type));
     }
@@ -158,6 +162,7 @@ export default function CinemaForm({ onAddCinemas }) {
 
   function handleClearSelectedMovie() {
     setSelectedMovieId(null);
+    setSelectedSearchMovieSummary(null);
     setCinemaType(FALLBACK_TYPE);
     setGenre(DEFAULT_GENRE);
     setTitle("");
@@ -180,6 +185,7 @@ export default function CinemaForm({ onAddCinemas }) {
                 onChange={(e) => {
                   setTitle(e.target.value);
                   setSelectedMovieId(null);
+                  setSelectedSearchMovieSummary(null);
                   if (errors.title)
                     setErrors((prev) => ({ ...prev, title: "" }));
                 }}
