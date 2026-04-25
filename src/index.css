@@ -7,8 +7,13 @@
   font-family: "Roboto", "Merriweather Sans", sans-serif;
 }
 
+html {
+  background-color: #28282b;
+}
+
 body {
   background-color: #28282b;
+  min-height: 100vh;
 }
 
 .txt-income {
