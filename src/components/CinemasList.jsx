@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./styles/cinemasList.css";
+import { GENRE_OPTIONS } from "../constants/genres";
 
 const TYPE_BADGE_CLASS = {
   Movie: "badge-movie",
@@ -11,18 +12,6 @@ const STATUS_BADGE_CLASS = {
   Watching: "status-watching",
   "Want to watch": "status-want",
 };
-
-const GENRE_OPTIONS = [
-  "Action",
-  "Animation",
-  "Comedy",
-  "Documentary",
-  "Drama",
-  "Horror",
-  "Romance",
-  "Sci-Fi",
-  "Thriller",
-];
 
 function hasPosterImage(poster) {
   return Boolean(poster && poster !== "N/A");
