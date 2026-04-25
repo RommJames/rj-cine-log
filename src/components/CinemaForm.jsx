@@ -66,13 +66,15 @@ export default function CinemaForm({ onAddCinemas }) {
   const [errors, setErrors] = useState({});
   const [selectedMovieId, setSelectedMovieId] = useState(null);
 
-  const { searchMovies, isSearching, searchError } = useSearchMovies(title);
+  const isMovieSelected = Boolean(selectedMovieId);
+  const { searchMovies, isSearching, searchError } = useSearchMovies(
+    isMovieSelected ? "" : title,
+  );
   const { movieDetail, isLoading, movieDetailError } =
     useMovieDetails(selectedMovieId);
   const selectedSearchMovie = searchMovies.find(
     (movie) => movie.imdbID === selectedMovieId,
   );
-  const isMovieSelected = Boolean(selectedMovieId);
   const selectedTitle = isMovieSelected
     ? movieDetail?.Title || selectedSearchMovie?.Title || title
     : title;
