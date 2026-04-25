@@ -380,11 +380,17 @@
 }
 
 .cinema-form-rec-item {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 8px 10px;
+  border: 0;
+  background: transparent;
   border-radius: 7px;
+  text-align: left;
+  color: inherit;
+  font: inherit;
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
