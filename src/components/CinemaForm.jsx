@@ -140,6 +140,7 @@ export default function CinemaForm({ onAddCinemas }) {
     setGenre(DEFAULT_GENRE);
     setStatus("Want to watch");
     setRating(null);
+    setHoverRating(null);
     setComment("");
     setSelectedMovieId(null);
     setSelectedSearchMovieSummary(null);
