@@ -15,7 +15,7 @@ export function useSearchMovies(query) {
           setIsSearching(true);
 
           const res = await fetch(
-            `https://www.omdbapi.com/?apikey=${import.meta.env.VITE_OMDB_API_KEY}&s=${query}`,
+            `https://www.omdbapi.com/?apikey=${import.meta.env.VITE_OMDB_API_KEY}&s=${encodeURIComponent(query.trim())}`,
             { signal: controller.signal },
           );
 
