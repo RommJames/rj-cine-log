@@ -72,13 +72,13 @@ export default function MovieDetailPreview({
         </div>
 
         <div className="cinema-form-movie-detail-meta">
-          {Year && (
+          {Year && Year !== "N/A" && (
             <span className="cinema-form-movie-detail-pill">{Year}</span>
           )}
-          {Runtime && (
+          {Runtime && Runtime !== "N/A" && (
             <span className="cinema-form-movie-detail-pill">{Runtime}</span>
           )}
-          {Genre && (
+          {Genre && Genre !== "N/A" && (
             <span className="cinema-form-movie-detail-pill">{Genre}</span>
           )}
           {imdbRating && imdbRating !== "N/A" && (
