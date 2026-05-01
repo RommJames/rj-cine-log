@@ -15,6 +15,7 @@ export function useMovieDetails(selectedId) {
       }
 
       const controller = new AbortController();
+      let ignore = false;
 
       async function fetchMovieDetail() {
         try {
@@ -35,21 +36,24 @@ export function useMovieDetails(selectedId) {
           if (data.Response === "False")
             throw new Error(data.Error || "Movie not found");
 
-          setMovieDetail(data);
-          setMovieDetailError("");
+          if (!ignore) {
+            setMovieDetail(data);
+            setMovieDetailError("");
+          }
         } catch (error) {
-          if (error.name !== "AbortError") {
+          if (!ignore && error.name !== "AbortError") {
             setMovieDetail(null);
             setMovieDetailError(error.message);
           }
         } finally {
-          setIsLoading(false);
+          if (!ignore) setIsLoading(false);
         }
       }
 
       fetchMovieDetail();
 
       return function () {
+        ignore = true;
         controller.abort();
       };
     },

@@ -8,6 +8,7 @@ export function useSearchMovies(query) {
   useEffect(
     function () {
       const controller = new AbortController();
+      let ignore = false;
 
       async function fetchMovies() {
         try {
@@ -27,14 +28,16 @@ export function useSearchMovies(query) {
           if (data.Response === "False")
             throw new Error(data.Error || "Movie not found");
 
-          setSearchMovies(data.Search);
-          setSearchError("");
+          if (!ignore) {
+            setSearchMovies(data.Search);
+            setSearchError("");
+          }
         } catch (error) {
-          if (error.name !== "AbortError") {
+          if (!ignore && error.name !== "AbortError") {
             setSearchError(error.message);
           }
         } finally {
-          setIsSearching(false);
+          if (!ignore) setIsSearching(false);
         }
       }
 
@@ -50,6 +53,7 @@ export function useSearchMovies(query) {
       }, 400);
 
       return function () {
+        ignore = true;
         clearTimeout(timeoutId);
         controller.abort();
       };
