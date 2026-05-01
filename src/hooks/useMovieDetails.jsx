@@ -19,6 +19,7 @@ export function useMovieDetails(selectedId) {
       async function fetchMovieDetail() {
         try {
           setMovieDetailError("");
+          setMovieDetail(null);
           setIsLoading(true);
 
           const res = await fetch(
