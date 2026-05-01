@@ -62,8 +62,7 @@ export default function CinemaForm({ onAddCinemas }) {
   const hasLoadedMovieDetail = Boolean(
     selectedMovieId && movieDetail && !movieDetailError,
   );
-  const isSearchSelectionLocked =
-    Boolean(selectedMovieId) && (isLoading || hasLoadedMovieDetail);
+  const isSearchSelectionLocked = Boolean(selectedMovieId);
   const { searchMovies, isSearching, searchError } = useSearchMovies(
     isMovieSelected ? "" : title,
   );
