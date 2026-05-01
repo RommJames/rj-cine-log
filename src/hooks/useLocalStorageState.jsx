@@ -13,7 +13,12 @@ export function useLocalStorageState(initialState, key) {
       } catch {
         try {
           localStorage.removeItem(key);
-        } catch {}
+        } catch (removeErr) {
+          console.warn(
+            `Failed to remove corrupted localStorage key "${key}":`,
+            removeErr,
+          );
+        }
         return initialState;
       }
     } catch {
