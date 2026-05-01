@@ -256,7 +256,10 @@ export default function CinemaForm({ onAddCinemas }) {
             <button
               type="submit"
               className="cinema-form-btn"
-              disabled={isMovieSelected && isLoading}
+              disabled={
+                isMovieSelected &&
+                (isLoading || !movieDetail || Boolean(movieDetailError))
+              }
             >
               + Add
             </button>
