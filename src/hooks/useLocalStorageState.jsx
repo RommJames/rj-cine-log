@@ -30,7 +30,12 @@ export function useLocalStorageState(initialState, key) {
     function () {
       try {
         localStorage.setItem(key, JSON.stringify(value));
-      } catch {}
+      } catch (setErr) {
+        console.warn(
+          `Failed to persist localStorage key "${key}":`,
+          setErr,
+        );
+      }
     },
     [value, key],
   );
